@@ -1,9 +1,12 @@
 package org.example;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.util.Scanner;
 
-public class Basket implements Serializable{
+public class Basket implements Serializable {
 
     private String[] products;
     private int[] prices;
@@ -11,8 +14,10 @@ public class Basket implements Serializable{
     private int[] counts;
 
 
-    private Basket() {
-
+    public Basket() {
+        this.products = new String[]{"Молоко", "Печенье", "Шоколад"};
+        this.prices = new int[]{100, 200, 300};
+        //this.counts = new int[]{0,0,0};
     }
 
     public Basket(String[] products, int[] prices) {
@@ -26,6 +31,10 @@ public class Basket implements Serializable{
     }
 
     public void printCart() {
+        if (counts == null) {
+            System.out.println("Ваша корзина пуста! :(");
+            return;
+        }
         int sum = 0;
         System.out.println("Текущая корзина:");
         for (int i = 0; i < counts.length; i++) {
@@ -83,7 +92,6 @@ public class Basket implements Serializable{
     }
 
 
-
     public String[] getProducts() {
         return products;
     }
@@ -91,4 +99,24 @@ public class Basket implements Serializable{
     public int[] getPrices() {
         return prices;
     }
+
+    public void saveToJson(File file) throws IOException {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.create();
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(gson.toJson(this));
+            writer.flush();
+        }
+    }
+
+    public static Basket loadFromJson(File file) throws IOException {
+        Basket basket;
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.create();
+        try (FileReader reader = new FileReader(file)) {
+            basket = gson.fromJson(reader, Basket.class);
+        }
+        return basket;
+    }
 }
+
